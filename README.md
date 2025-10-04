@@ -18,15 +18,7 @@ A modern web application for task management and automation with email notificat
 - Local storage for data persistence
 
 ## Screenshots
-
-![Dashboard](screenshots/html.png)
-Interface principal do dashboard mostrando a lista de tarefas e opções de gerenciamento
-
-![Email Notification](screenshots/email.png)
-Sistema de notificação por email integrado para alertas e lembretes de tarefas
-
-![n8n Workflow](screenshots/ne8on.png)
-Fluxo de automação configurado no n8n para processamento e distribuição de tarefas
+<img src="screenshots/html.png" width="600" alt="Dashboard"/> *Main dashboard interface showing task list and management options*<img src="screenshots/email.png" width="600" alt="Email Notification"/> *Integrated email notification system for task alerts and reminders*<img src="screenshots/ne8on.png" width="600" alt="n8n Workflow"/> *Automation workflow configured in n8n for task processing and distribution*
 
 ## Usage
 
