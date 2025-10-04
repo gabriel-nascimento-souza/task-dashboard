@@ -1,48 +1,63 @@
 # Task Dashboard
 
-A modern task management application with real-time database sync and email notifications.
+A modern web application for task management and automation with email notifications and workflow integration.
 
 ## Features
 
-- Add tasks with user email
-- Mark tasks as complete/incomplete  
-- Delete tasks with smooth animations
-- Real-time Supabase database sync
-- Automated email notifications via n8n
-- Responsive notebook-style design
+- Task creation, editing, and deletion
+- Advanced filtering and search capabilities
+- Email notification system
+- n8n workflow automation integration
+- Responsive design for all devices
 
-## Tech Stack
+## Technologies Used
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Backend**: Supabase (PostgreSQL)
-- **Automation**: n8n workflow
-- **Email**: Gmail API / Resend
-- **Deployment**: Static hosting (Netlify/Vercel)
-
-## Quick Start
-
-1. Clone the repository
-2. Open `index.html` in your browser
-3. Start adding tasks!
+- HTML5, CSS3, JavaScript
+- n8n for workflow automation
+- Email integration for notifications
+- Local storage for data persistence
 
 ## Screenshots
 
 ![Dashboard](screenshots/html.png)
+Interface principal do dashboard mostrando a lista de tarefas e opções de gerenciamento
+
 ![Email Notification](screenshots/email.png)
+Sistema de notificação por email integrado para alertas e lembretes de tarefas
+
 ![n8n Workflow](screenshots/ne8on.png)
+Fluxo de automação configurado no n8n para processamento e distribuição de tarefas
 
-## Configuration
+## Usage
 
-### Supabase Setup
-- Create a Supabase project
-- Run the SQL schema in `database/schema.sql`
-- Update Supabase credentials in `index.html`
+- Add new tasks using the task creation form
+- Edit existing tasks by clicking the edit button
+- Filter tasks by status using the filter options
+- Delete tasks using the delete button
+- The system integrates with n8n workflows for automated task processing
 
-### n8n Automation
-- Import the workflow from `automation/n8n-workflow.json`
-- Configure email service (Gmail/Resend)
-- Set up scheduled triggers
+## Project Structure
+
+```
+task-dashboard/
+|-- index.html
+|-- styles/
+|   |-- style.css
+|-- scripts/
+|   |-- script.js
+|-- screenshots/
+|   |-- html.png
+|   |-- email.png
+|   |-- ne8on.png
+|-- README.md
+```
 
 ## License
 
-MIT License - feel free to use this project for learning and development!
+This project is open source and available under the MIT License.
+
+## Contact
+
+Gabriel Nascimento Souza - [GitHub Profile](https://github.com/gabriel-nascimento-souza)
+
+Project Link: [https://github.com/gabriel-nascimento-souza/task-dashboard](https://github.com/gabriel-nascimento-souza/task-dashboard)
