@@ -27,9 +27,9 @@ A modern task management application with real-time database sync and email noti
 
 ## Screenshots
 
-![Dashboard](screenshots/dashboard.png)
-![Email Notification](screenshots/email-notification.png)
-![n8n Workflow](screenshots/n8n-workflow.png)
+![Dashboard](screenshots/html.png)
+![Email Notification](screenshots/email.png)
+![n8n Workflow](screenshots/ne8on.png)
 
 ## Configuration
 
