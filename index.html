@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Task Dashboard</title>
+  <style>
+    body {
+      background: #f7f7f7;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2d3a4a;
+      margin-top: 50px;
+      font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
+      letter-spacing: 2px;
+      text-shadow: 1px 1px 0 #fff, 2px 2px 0 #b0c4de;
+      font-size: 2.2rem;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      margin: 40px 0 30px 0;
+      gap: 12px;
+    }
+
+    input[type="text"], input[type="email"] {
+      padding: 12px;
+      border: none;
+      border-bottom: 2px dashed #b0c4de;
+      background: transparent;
+      font-size: 1.1rem;
+      width: 200px;
+      outline: none;
+      font-family: inherit;
+    }
+
+    input[type="email"] {
+      width: 180px;
+    }
+
+    button {
+      padding: 12px 24px;
+      background: #e3eaff;
+      color: #2d3a4a;
+      border: 1.5px solid #b0c4de;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: 1px 1px 0 #fff;
+      font-size: 1.1rem;
+    }
+    button:hover {
+      background: #fff;
+      color: #2d3a4a;
+    }
+
+    #taskList {
+      max-width: 500px;
+      margin: 0 auto 60px auto;
+      padding: 0 0 40px 0;
+      list-style: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        #fff 0px,
+        #fff 38px,
+        #b0c4de 39px,
+        #fff 40px
+      );
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.08), 0 1.5px 0 #b0c4de;
+      border: 2px solid #b0c4de;
+      position: relative;
+      min-height: 320px;
+    }
+
+    #taskList::before {
+      content: "";
+      position: absolute;
+      left: 32px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #ff4d4d;
+      z-index: 1;
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+
+    #taskList li {
+      background: transparent;
+      margin-bottom: 0;
+      padding: 0 8px 0 72px;
+      font-size: 1.18rem;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      position: relative;
+      z-index: 2;
+      font-family: 'Comic Sans MS', 'Segoe UI', Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    #taskList li .task-text {
+      flex: 1;
+      display: block;
+      position: relative;
+      z-index: 1;
+      padding: 0;
+      margin-left: 0;
+    }
+
+    #taskList li .remove {
+      background: none !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      color: #b0c4de;
+      font-size: 1.8em;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s, color 0.2s;
+      margin-left: 12px;
+      z-index: 3;
+      align-self: center;
+      padding: 0 4px;
+      line-height: 1;
+      font-weight: bold;
+    }
+    #taskList li .remove:hover {
+      opacity: 1;
+      color: #ff4d4d;
+    }
+
+    #taskList li::before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 10px;
+      height: 10px;
+      background: #111;
+      border-radius: 50%;
+      border: none;
+      opacity: 0.8;
+    }
+
+    #taskList li.done .task-text {
+      color: #b0b0b0;
+      text-decoration: line-through;
+    }
+
+    #taskList li.done::after {
+      content: "";
+      position: absolute;
+      left: 44px;
+      right: 32px;
+      top: 50%;
+      height: 2px;
+      background: #b0c4de;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: strike 0.4s forwards;
+    }
+
+    @keyframes strike {
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    #taskList li.deleting {
+      opacity: 0;
+      transform: translateX(-100%);
+      max-height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    .error {
+      text-align: center;
+      color: #ff4444;
+      padding: 20px;
+      background: #ffeaea;
+      margin: 10px auto;
+      max-width: 500px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>My tasks</h1>
+  
+  <form id="taskForm">
+    <input type="email" id="email" placeholder="Your email" required>
+    <input type="text" id="title" placeholder="New task" required>
+    <button type="submit">Add</button>
+  </form>
+
+  <ul id="taskList"></ul>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+  /**
+   * SETUP INSTRUCTIONS:
+   * 1. Create account at supabase.com
+   * 2. Create new project and database
+   * 3. Run the SQL schema from database/schema.sql
+   * 4. Go to Settings > API > Copy URL and anon key
+   * 5. Replace the credentials below
+   */
+  
+  // Supabase configuration - REPLACE WITH YOUR CREDENTIALS
+  const supabaseUrl = "YOUR_SUPABASE_URL_HERE";
+  const supabaseKey = "YOUR_SUPABASE_ANON_KEY_HERE";
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  // Validate Supabase credentials on load
+  if (supabaseUrl.includes("YOUR_SUPABASE") || supabaseKey.includes("YOUR_SUPABASE")) {
+    const list = document.getElementById("taskList");
+    list.innerHTML = `
+      <div class="error">
+        <strong>Setup Required:</strong><br>
+        Please configure your Supabase credentials in the JavaScript code.<br>
+        Check the README.md for setup instructions.
+      </div>
+    `;
+    throw new Error("Supabase credentials not configured");
+  }
+
+  /**
+   * Load all tasks from Supabase and display them
+   */
+  async function loadTasks() {
+    const list = document.getElementById("taskList");
+    list.innerHTML = '<div class="loading">Loading tasks...</div>';
+
+    // Fetch tasks from Supabase ordered by creation date (newest first)
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error loading tasks:", error);
+      list.innerHTML = `
+        <div class="error">
+          Error connecting to database.<br>
+          Please check your Supabase credentials and connection.
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    if (data.length === 0) {
+      list.innerHTML = '<div class="loading">No tasks yet. Add your first task above!</div>';
+      return;
+    }
+
+    // Create list item for each task
+    data.forEach(task => {
+      const li = document.createElement("li");
+      const title = task.title || "No title";
+      const email = task.email || "No email";
+
+      // Create task text display
+      const textSpan = document.createElement("span");
+      textSpan.className = "task-text";
+      textSpan.textContent = `${title} (${email})`;
+      li.appendChild(textSpan);
+
+      // Add 'done' class if task is completed
+      if (task.done) li.classList.add("done");
+
+      /**
+       * DELETE button - removes task from database and UI
+       */
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "remove";
+      removeBtn.innerHTML = "&times;";
+      removeBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        // Confirm deletion with user
+        if (!confirm(`Delete task "${title}"?`)) return;
+
+        // Start deletion animation
+        li.classList.add("deleting");
+        
+        // Delete from database after animation starts
+        setTimeout(async () => {
+          const { error: deleteError } = await supabase
+            .from("tasks")
+            .delete()
+            .eq("id", task.id);
+
+          if (deleteError) {
+            console.error("Error deleting task:", deleteError);
+            // Reverse animation if error occurs
+            li.classList.remove("deleting");
+            alert("Error deleting task. Please try again.");
+          } else {
+            // Remove element from DOM after animation completes
+            setTimeout(() => {
+              li.remove();
+              // If no tasks left, show message
+              if (list.children.length === 0) {
+                list.innerHTML = '<div class="loading">No tasks yet. Add your first task above!</div>';
+              }
+            }, 400);
+          }
+        }, 300);
+      });
+      li.appendChild(removeBtn);
+
+      /**
+       * Click handler to toggle task completion status
+       */
+      textSpan.addEventListener("click", async () => {
+        const { error: updateError } = await supabase
+          .from("tasks")
+          .update({ done: !task.done })
+          .eq("id", task.id);
+
+        if (updateError) {
+          console.error("Error updating task:", updateError);
+          alert("Error updating task. Please try again.");
+        } else {
+          loadTasks();
+        }
+      });
+
+      list.appendChild(li);
+    });
+  }
+
+  /**
+   * Handle form submission to add new task
+   */
+  document.getElementById("taskForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const title = document.getElementById("title").value.trim();
+
+    // Validate input fields
+    if (!email || !title) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    // Insert new task into Supabase
+    const { error } = await supabase
+      .from("tasks")
+      .insert([{ title, email }]);
+
+    if (error) {
+      console.error("Error inserting task:", error);
+      alert("Error adding task! Please check your connection.");
+      return;
+    }
+
+    // Clear form and reload tasks
+    document.getElementById("title").value = "";
+    document.getElementById("email").value = "";
+    loadTasks();
+  });
+
+  // Load tasks when page loads
+  loadTasks();
+</script>
+</body>
+</html>
